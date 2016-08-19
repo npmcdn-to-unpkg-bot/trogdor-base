@@ -2,23 +2,33 @@
 
 import serial
 
-def time(time):
+# Return formatted time from RMC message
+def time(rmc):
+    time = rmc[1]
     hours = time[0:2]
     minutes = time[2:4]
     seconds = time[4:6]
     return hours + ":" + minutes + ":" + seconds
 
-def latitude(latitude):
+# Return formatted latitude from RMC message
+def latitude(rmc):
+    latitude = rmc[3]
     degrees = latitude[0:2]
     minutes = latitude[2:4]
     seconds = latitude[5:7] + "." + latitude[7:]
     return degrees + " " + minutes + "' " + seconds + '"'
 
-def longitude(longitude):
+# Return formatted longitude from RMC message
+def longitude(rmc):
+    longitude = rmc[5]
     degrees = longitude[0:3]
     minutes = longitude[3:5]
     seconds = longitude[6:8] + "." + longitude[8:]
     return degrees + " " + minutes + "' " + seconds + '"'
+
+# Return number of satellites in view from GSV data
+def satellites(gsv):
+    return gsv[3]
 
 def main():
     port = "/dev/ttyUSB0"
@@ -31,13 +41,13 @@ def main():
         reading = ser.readline().split(",")
 
         if (reading[0] == "$GPRMC"):
-            t = reading[1]
-            lat = reading[3]
-            lon = reading[5]
+            print("Time: " + time(reading))
+            print("Lat: " + latitude(reading))
+            print("Longitude: " + longitude(reading))
 
-            print("Time: " + time(t))
-            print("Lat: " + latitude(lat))
-            print("Longitude: " + longitude(lon))
+        elif (reading[0] == "$GPGSV"):
+            if (int(reading[2]) == 1):   # Sentence number has to be 1
+                print("Satellites: " + satellites(reading))
 
     ser.close()
 
