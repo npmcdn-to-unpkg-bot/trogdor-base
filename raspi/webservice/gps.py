@@ -10,21 +10,21 @@ def time(rmc):
     seconds = time[4:6]
     return hours + ":" + minutes + ":" + seconds
 
-# Return formatted latitude from RMC message
+# Return decimal coordinates from RMC message
 def latitude(rmc):
     latitude = rmc[3]
-    degrees = latitude[0:2]
-    minutes = latitude[2:4]
-    seconds = latitude[5:7] + "." + latitude[7:]
-    return degrees + " " + minutes + "' " + seconds + '"'
+    degrees = float(latitude[0:2])
+    minutes = float(latitude[2:4]) / 60
+    seconds = float(latitude[5:7] + "." + latitude[7:]) / 3600
+    return degrees + minutes + seconds
 
-# Return formatted longitude from RMC message
+# Return decimal coordinates from RMC message
 def longitude(rmc):
     longitude = rmc[5]
-    degrees = longitude[0:3]
-    minutes = longitude[3:5]
-    seconds = longitude[6:8] + "." + longitude[8:]
-    return degrees + " " + minutes + "' " + seconds + '"'
+    degrees = float(longitude[0:3])
+    minutes = float(longitude[3:5]) / 60
+    seconds = float(longitude[6:8] + "." + longitude[8:]) / 3600
+    return degrees + minutes + seconds
 
 # Return number of satellites in view from GSV data
 def satellites(gsv):

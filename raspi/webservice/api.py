@@ -4,24 +4,30 @@ from threading import Thread
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
+testing = True
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
 socketio = SocketIO(app)
 thread = None
 
 def background_loop():
-    port = "/dev/ttyUSB0"
-    baud = 9600
-    timeout = 10
-
-    ser = serial.Serial(port, baud, timeout=timeout)
+    if testing is False:
+        port = "/dev/ttyUSB0"
+        baud = 9600
+        timeout = 10
+        ser = serial.Serial(port, baud, timeout=timeout)
 
     while True:
-        reading = ser.readline().split(",")
-        if (reading[0] == "$GPRMC"):
-            lat = gps.latitude(reading)
-            lon = gps.longitude(reading)
-            socketio.emit('gps', {'latitude' : lat, 'longitude' : lon})
+        if testing:
+            socketio.emit('gps', {'latitude' : 50.003, 'longitude' : -35.234})
+            socketio.sleep(1);
+        else:
+            reading = ser.readline().split(",")
+            if (reading[0] == "$GPRMC"):
+                lat = gps.latitude(reading)
+                lon = gps.longitude(reading)
+                socketio.emit('gps', {'latitude' : lat, 'longitude' : lon})
 
 @app.route('/')
 def index():
