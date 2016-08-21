@@ -50,5 +50,3 @@ def main():
                 print("Satellites: " + satellites(reading))
 
     ser.close()
-
-main()
