@@ -21,7 +21,7 @@ def background_loop():
         if (reading[0] == "$GPRMC"):
             lat = latitude(reading)
             lon = longitude(reading)
-            socketio.emit('gps', {'latitude' : 70.154, 'longitude' : 35.653})
+            socketio.emit('gps', {'latitude' : lat, 'longitude' : lon})
 
 @app.route('/')
 def index():
