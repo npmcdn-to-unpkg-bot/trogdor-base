@@ -30,9 +30,9 @@ class GPS:
         self.longitude = parse_latitude(rmc_data)
 
     def parse(self):
-        reading = ser.readline().decode("utf-8").split(',')
+        reading = self.ser.readline().decode("utf-8").split(',')
         if (reading[0] == "$GPRMC"):
-            parse_rmc(reading)
+            self.parse_rmc(reading)
 
     def get_json(self):
-        return {'time': time, 'latitude': latitude, 'longitude': longitude}
+        return {'time': self.time, 'latitude': self.latitude, 'longitude': self.longitude}
