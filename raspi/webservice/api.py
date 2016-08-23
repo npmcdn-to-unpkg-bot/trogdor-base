@@ -10,22 +10,9 @@ socketio = SocketIO(app, async_mode='threading')
 thread = None
 
 def background_loop():
-    port = "/dev/ttyUSB0"
-    baud = 9600
-    timeout = 10
-    ser = serial.Serial(port, baud, timeout=timeout)
-
-    while True:
-        reading = ser.readline().decode("utf-8").split(',')
-        if (reading[0] == "$GPRMC"):
-            lat = gps.latitude(reading)
-            lon = gps.longitude(reading)
-            time = gps.time(reading)
-            socketio.emit('gps', {'latitude' : lat, 'longitude' : lon, 'time' : time})
-        elif (reading[0] == "$GPGSV"):
-            if (int(reading[2]) == 1):
-                sats = gps.satellites(reading)
-                socketio.emit('satellites', {'satellites' : sats})
+    g = gps.GPS('/dev/ttyUSB0', 9600, 10);
+    g.parse();
+    socketio.emit('gps', g.get_json())
 
 @app.route('/')
 def index():

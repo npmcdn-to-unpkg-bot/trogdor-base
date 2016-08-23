@@ -1,37 +1,38 @@
-# Read GPS data from serial and parse it into something useful
-
 import serial
 
-# Return formatted time from RMC message
-def time(rmc):
-    time = rmc[1]
-    hours = time[0:2]
-    minutes = time[2:4]
-    seconds = time[4:6]
-    return hours + ":" + minutes + ":" + seconds
+class GPS:
+    ser = None
 
-# Return decimal coordinates from RMC message
-def latitude(rmc):
-    latitude = rmc[3]
-    degrees = float(latitude[0:2])
-    minutes = float(latitude[2:4]) / 60
-    seconds = latitude[5:7]
-    seconds_decimal = '.' + latitude[7:]
-    seconds_total = (float(seconds) + float(seconds_decimal)) / 3600
-    return degrees + minutes + seconds_total
+    time = None
+    latitude = None
+    longitude = None
+    satellites = 0
 
-# Return decimal coordinates from RMC message
-def longitude(rmc):
-    longitude = rmc[5]
-    degrees = float(longitude[0:3])
-    minutes = float(longitude[3:5]) / 60
+    def __init__(self, port, baud, timeout):
+        self.ser = serial.Serial(port, baud, timeout=timeout)
 
-    seconds = longitude[6:8]
-    seconds_decimal = '.' + longitude[8:]
-    seconds_total = (float(seconds) + float(seconds_decimal)) / 3600
+    def parse_time(rmc_data):
+        time = rmc_data[1]
+        hours = time[0:2]
+        minutes = time[2:4]
+        seconds = time[4:6]
+        return hours + ":" + minutes + ":" + seconds
 
-    return -(degrees + minutes + seconds_total)
+    def parse_latitude(rmc_data):
+        return 40
 
-# Return number of satellites in view from GSV data
-def satellites(gsv):
-    return gsv[3]
+    def parse_longitude(rmc_data):
+        return -80
+
+    def parse_rmc(self, rmc_data):
+        self.time = parse_time(rmc_data)
+        self.latitude = parse_latitude(rmc_data)
+        self.longitude = parse_latitude(rmc_data)
+
+    def parse(self):
+        reading = ser.readline().decode("utf-8").split(',')
+        if (reading[0] == "$GPRMC"):
+            parse_rmc(reading)
+
+    def get_json(self):
+        return {'time': time, 'latitude': latitude, 'longitude': longitude}
