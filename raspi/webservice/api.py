@@ -6,7 +6,7 @@ from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode='threading')
 thread = None
 
 def background_loop():
@@ -16,12 +16,15 @@ def background_loop():
     ser = serial.Serial(port, baud, timeout=timeout)
 
     while True:
-        reading = ser.readline().split(",")
+        reading = ser.readline().decode("utf-8").split(',')
         if (reading[0] == "$GPRMC"):
             lat = gps.latitude(reading)
             lon = gps.longitude(reading)
-            # print(lat + ", " + lon)
             socketio.emit('gps', {'latitude' : lat, 'longitude' : lon})
+        elif (reading[0] == "$GPGSV"):
+            if (int(reading[2]) == 1):
+                sats = gps.satellites(reading)
+                socketio.emit('satellites', {'satellites' : sats})
 
 @app.route('/')
 def index():
