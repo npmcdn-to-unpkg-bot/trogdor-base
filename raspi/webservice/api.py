@@ -20,7 +20,8 @@ def background_loop():
         if (reading[0] == "$GPRMC"):
             lat = gps.latitude(reading)
             lon = gps.longitude(reading)
-            socketio.emit('gps', {'latitude' : lat, 'longitude' : lon})
+            time = gps.time(reading)
+            socketio.emit('gps', {'latitude' : lat, 'longitude' : lon, 'time' : time})
         elif (reading[0] == "$GPGSV"):
             if (int(reading[2]) == 1):
                 sats = gps.satellites(reading)

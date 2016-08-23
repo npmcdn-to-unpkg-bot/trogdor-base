@@ -9,6 +9,7 @@ $(document).ready(function(){
 
     socket.on('gps', function(message) {
         console.log(message);
+        $('#time').html("Time (UTC): " + message.time);
         $('#coords').html(message.latitude + ', ' + message.longitude);
         map.setView([message.latitude, message.longitude], 18);
     });
@@ -17,5 +18,5 @@ $(document).ready(function(){
         console.log(message);
         $('#satellites').html("Satellites: " + message.satellites);
     });
-    
+
 });
