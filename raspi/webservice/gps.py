@@ -1,5 +1,4 @@
 # Read GPS data from serial and parse it into something useful
-
 import serial
 
 # Return formatted time from RMC message
