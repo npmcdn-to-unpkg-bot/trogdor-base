@@ -11,8 +11,10 @@ thread = None
 
 def background_loop():
     g = gps.GPS('/dev/ttyUSB0', 9600, 10);
-    g.parse();
-    socketio.emit('gps', g.get_json())
+    while True:
+        g.parse();
+        print(g.get_json())
+        socketio.emit('gps', g.get_json())
 
 @app.route('/')
 def index():
