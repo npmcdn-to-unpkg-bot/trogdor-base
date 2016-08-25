@@ -6,7 +6,10 @@ class GPS:
     time = None
     latitude = None
     longitude = None
+    speed = 0
+    altitude = 0
     satellites = 0
+    fix_quality = 0;
 
     def __init__(self, port, baud, timeout):
         self.ser = serial.Serial(port, baud, timeout=timeout)
@@ -39,7 +42,7 @@ class GPS:
             decimal = degrees + minutes / 60
         except ValueError:
             print("Value error for: " + longitude)
-            
+
         if rmc_data[6] == "W":
             decimal *= -1
 
@@ -49,11 +52,37 @@ class GPS:
         self.time = self.parse_time(rmc_data)
         self.latitude = self.parse_latitude(rmc_data)
         self.longitude = self.parse_longitude(rmc_data)
+        try:
+            self.speed = float(rmc_data[7])
+        except ValueError:
+            print("Value error for: " + rmc_data[7])
+
+    def parse_gga(self, gga_data):
+        self.fix_quality = int(gga_data[6])
+        self.satellites = int(gga_data[7])
+        try:
+            self.altitude = float(gga_data[9])
+        except ValueError:
+            print("Value error for: " + gga_data[9])
 
     def parse(self):
         reading = self.ser.readline().decode("utf-8").split(',')
         if (reading[0] == "$GPRMC"):
             self.parse_rmc(reading)
+        elif (reading[0] == "$GPGGA"):
+            self.parse_gga(reading)
 
     def get_json(self):
-        return {'time': self.time, 'latitude': self.latitude, 'longitude': self.longitude}
+        return {
+            'rmc': {
+                'time': self.time,
+                'latitude': self.latitude,
+                'longitude': self.longitude,
+                'speed': self.speed,
+            },
+            'gga': {
+                'satellites': self.satellites,
+                'altitude': self.altitude,
+                'fix_quality': self.fix_quality
+            }
+        }

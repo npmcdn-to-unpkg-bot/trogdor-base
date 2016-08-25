@@ -3,7 +3,17 @@ var map;
 $(document).ready(function(){
     var socket = io.connect();
     
-    var map = L.map('map');
+    var map = L.map('map', {
+        zoomControl: false,
+        dragging: false,
+        touchZoom: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false
+    });
+
+    map.setZoom(18);
 
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(map);
 
@@ -12,15 +22,14 @@ $(document).ready(function(){
 
     socket.on('gps', function(message) {
         console.log(message);
-        $('#time').html("Time (UTC): " + message.time);
-        $('#coords').html(message.latitude + ', ' + message.longitude);
-        map.setView([message.latitude, message.longitude], 18);
-        centerMarker.setLatLng([message.latitude, message.longitude]);
-    });
-
-    socket.on('satellites', function(message) {
-        console.log(message);
-        $('#satellites').html("Satellites: " + message.satellites);
+        $('#time').html("Time (UTC): " + message.rmc.time);
+        $('#coords').html(message.rmc.latitude.toFixed(6) + ', ' + message.rmc.longitude.toFixed(6));
+        $('#speed').html("Speed (Knots): " + message.rmc.speed);
+        $('#altitude').html("Altitude (M): " + message.gga.altitude);
+        $('#satellites').html("Satellites: " + message.gga.satellites);
+        $('#fix').html("Fix Quality: " + message.gga.fix_quality);
+        map.setView([message.rmc.latitude, message.rmc.longitude]);
+        centerMarker.setLatLng([message.rmc.latitude, message.rmc.longitude]);
     });
 
 });
