@@ -20,18 +20,26 @@ class GPS:
 
     def parse_latitude(self, rmc_data):
         latitude = rmc_data[3]
-        degrees = float(latitude[:2])
-        minutes = float(latitude[2:])
-        decimal = degrees + minutes / 60
+        decimal = 0.0
+        try:
+            degrees = float(latitude[:2])
+            minutes = float(latitude[2:])
+            decimal = degrees + minutes / 60
+        except ValueError:
+            print("Value error for: " + latitude)
 
         return decimal
 
     def parse_longitude(self, rmc_data):
         longitude = rmc_data[5]
-        degrees = float(longitude[:3])
-        minutes = float(longitude[3:])
-        decimal = degrees + minutes / 60
-
+        decimal = 0.0
+        try:
+            degrees = float(longitude[:3])
+            minutes = float(longitude[3:])
+            decimal = degrees + minutes / 60
+        except ValueError:
+            print("Value error for: " + longitude)
+            
         if rmc_data[6] == "W":
             decimal *= -1
 
