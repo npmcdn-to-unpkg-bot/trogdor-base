@@ -1,8 +1,6 @@
-import serial
+import serialsensor
 
-class GPS:
-    ser = None
-
+class GPS(serialsensor.SerialSensor):
     time = None
     latitude = None
     longitude = None
@@ -12,7 +10,7 @@ class GPS:
     fix_quality = 0;
 
     def __init__(self, port, baud, timeout):
-        self.ser = serial.Serial(port, baud, timeout=timeout)
+        super().__init__(port, baud, timeout)
 
     def parse_time(self, rmc_data):
         time = rmc_data[1]

@@ -1,5 +1,5 @@
 import gps
-import serial
+import motor
 from threading import Thread
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
@@ -7,13 +7,21 @@ from flask_socketio import SocketIO, emit
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
 socketio = SocketIO(app, async_mode='threading')
-thread = None
 
-def background_loop():
+gps_thread = None
+motor_thread = None
+
+def gps_loop():
     g = gps.GPS('/dev/ttyUSB0', 9600, 10);
     while True:
         g.parse()
         socketio.emit('gps', g.get_json())
+
+def motor_loop():
+    m = motor.Motor('/dev/ttyACM0', 9600, 10);
+    while True:
+        m.parse()
+        socketio.emit('motor', m.get_json())
 
 @app.route('/')
 def index():
@@ -22,9 +30,13 @@ def index():
 @socketio.on('connect')
 def connected():
     print("connected")
-    global thread
-    if thread is None:
-        thread = socketio.start_background_task(target=background_loop)
+    global gps_thread
+    if gps_thread is None:
+        gps_thread = socketio.start_background_task(target=gps_loop)
+
+    global motor_thread
+    if motor_thread is None:
+        motor_thread = socketio.start_background_task(target=motor_loop)
 
 if __name__ == '__main__':
     socketio.run(app, host="0.0.0.0", debug=True)
