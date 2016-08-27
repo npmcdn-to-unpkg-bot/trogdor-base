@@ -37,14 +37,14 @@ def index():
 @socketio.on('drive')
 def drive():
     motor_init()
-    m.drive("left", 50);
-    m.drive("right", 50);
+    m.drive("left", 50)
+    m.drive("right", 50)
 
 @socketio.on('stop')
 def stop():
     motor_init()
-    m.drive("left", 0);
-    m.drive("right", 0);
+    m.drive("left", 0)
+    m.drive("right", 0)
 
 @socketio.on('connect')
 def connected():

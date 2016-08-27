@@ -87,3 +87,8 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Front-end
+*.css
+*.css.map
+.sass-cache/
