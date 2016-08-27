@@ -2,7 +2,7 @@ var map;
 
 $(document).ready(function(){
     var socket = io.connect();
-    
+
     var map = L.map('map', {
         zoomControl: false,
         dragging: false,
@@ -46,6 +46,14 @@ $(document).ready(function(){
         $('#motor').html("Motor Speed (L, R): " + message.l_speed + ", " + message.r_speed);
         $('#compass').html("Heading: " + message.heading);
         centerMarker.setRotationAngle(message.heading);
+    });
+
+    $("#go").click(function() {
+        socket.emit('drive');
+    });
+
+    $("#stop").click(function() {
+        socket.emit('stop');
     });
 
 });

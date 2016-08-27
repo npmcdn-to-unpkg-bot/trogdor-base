@@ -11,21 +11,40 @@ socketio = SocketIO(app, async_mode='threading')
 gps_thread = None
 motor_thread = None
 
+m = None
+
+def motor_init():
+    global m
+    if m is None:
+        m = motor.Motor('/dev/ttyACM0', 115200, 10);
+
+def motor_loop():
+    motor_init()
+    while True:
+        m.parse()
+        socketio.emit('motor', m.get_json())
+
 def gps_loop():
     g = gps.GPS('/dev/ttyUSB0', 9600, 10);
     while True:
         g.parse()
         socketio.emit('gps', g.get_json())
 
-def motor_loop():
-    m = motor.Motor('/dev/ttyACM0', 9600, 10);
-    while True:
-        m.parse()
-        socketio.emit('motor', m.get_json())
-
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@socketio.on('drive')
+def drive():
+    motor_init()
+    m.drive("left", 50);
+    m.drive("right", 50);
+
+@socketio.on('stop')
+def stop():
+    motor_init()
+    m.drive("left", 0);
+    m.drive("right", 0);
 
 @socketio.on('connect')
 def connected():
